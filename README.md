@@ -1,2 +1,2 @@
-# rcp
+# rc
 registry cleanup cli tool
