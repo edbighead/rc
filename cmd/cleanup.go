@@ -23,13 +23,10 @@ var (
 	// cleanupCmd represents the cleanup command
 	cleanupCmd = &cobra.Command{
 		Use:   "cleanup",
-		Short: "A brief description of your command",
-		Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+		Short: "Remove old images from repository",
+		Long: `
+Remove images from repository, based on creation date, keeping
+only a certain number of images`,
 		Run: func(cmd *cobra.Command, args []string) {
 			url, username, password := auth.Init(cfgFile)
 
@@ -45,7 +42,7 @@ to quickly create a Cobra application.`,
 			}
 
 			if userImage == "" || keepCount == "" {
-				exit("image flag and keep count is required")
+				exit("image and keep count flags are required")
 			}
 
 			if !manifest.ImageInRepo(userImage, repositories) {
@@ -127,7 +124,7 @@ to quickly create a Cobra application.`,
 					deleteUrlfmt := fmt.Sprintf("%s/v2/%s/manifests/%s", url, userImage, sha)
 					_, _, status := manifest.RegistryCall(username, password, deleteUrlfmt, "DELETE", "application/vnd.docker.distribution.manifest.v2+json")
 					if status == 202 {
-						fmt.Printf("%s:%s successfully deleted!\n", userImage, dt)
+						log.Printf("%s:%s successfully deleted!\n", userImage, dt)
 					}
 
 				}
@@ -140,9 +137,9 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(cleanupCmd)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.rc.yaml)")
-	cleanupCmd.Flags().StringVarP(&userImage, "image", "i", "", "image name to run cleanup")
+	cleanupCmd.Flags().StringVarP(&userImage, "image", "i", "", "image name")
 	cleanupCmd.Flags().StringVarP(&keepCount, "keep", "k", "", "number of image tags to keep")
-	cleanupCmd.Flags().BoolVar(&dryRun, "dry-run", false, "output all image tags")
+	cleanupCmd.Flags().BoolVar(&dryRun, "dry-run", false, "only output image tags")
 }
 
 func exit(msg interface{}) {
