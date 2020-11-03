@@ -41,6 +41,7 @@ func (c *config) getConf(path string) *config {
 	return c
 }
 
+// Init initializes required connection details
 func Init(cfgFile string) (url, username, password string) {
 
 	var file string

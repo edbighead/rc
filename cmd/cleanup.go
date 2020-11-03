@@ -127,7 +127,7 @@ to quickly create a Cobra application.`,
 					deleteUrlfmt := fmt.Sprintf("%s/v2/%s/manifests/%s", url, userImage, sha)
 					_, _, status := manifest.RegistryCall(username, password, deleteUrlfmt, "DELETE", "application/vnd.docker.distribution.manifest.v2+json")
 					if status == 202 {
-						fmt.Printf("%s:%s succesfully deleted!\n", userImage, dt)
+						fmt.Printf("%s:%s successfully deleted!\n", userImage, dt)
 					}
 
 				}
