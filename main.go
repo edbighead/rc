@@ -17,6 +17,7 @@ package main
 
 import "github.com/edbighead/rc/cmd"
 
+
 func main() {
 	cmd.Execute()
 }
