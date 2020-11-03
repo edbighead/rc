@@ -3,10 +3,12 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"sort"
 	"strconv"
 
+	"github.com/edbighead/rc/auth"
 	"github.com/edbighead/rc/manifest"
 	"github.com/heroku/docker-registry-client/registry"
 	"github.com/olekukonko/tablewriter"
@@ -15,8 +17,8 @@ import (
 
 var (
 	// Used for flags.
-	userImage, keepCount string
-	dryRun               bool
+	userImage, keepCount, cfgFile string
+	dryRun                        bool
 
 	// cleanupCmd represents the cleanup command
 	cleanupCmd = &cobra.Command{
@@ -29,9 +31,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			url := "https://registry.private"
-			username := "user"
-			password := "password"
+			url, username, password := auth.Init(cfgFile)
 
 			hub, err := registry.New(url, username, password)
 
@@ -93,9 +93,9 @@ to quickly create a Cobra application.`,
 			}
 
 			if k < len(tags) {
-				fmt.Println("Some images will be deleted")
+				log.Println("Some images will be deleted")
 			} else {
-				fmt.Println("No images will be deleted")
+				log.Println("No images will be deleted")
 			}
 
 			data := [][]string{}
@@ -139,12 +139,13 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(cleanupCmd)
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.rc.yaml)")
 	cleanupCmd.Flags().StringVarP(&userImage, "image", "i", "", "image name to run cleanup")
 	cleanupCmd.Flags().StringVarP(&keepCount, "keep", "k", "", "number of image tags to keep")
 	cleanupCmd.Flags().BoolVar(&dryRun, "dry-run", false, "output all image tags")
 }
 
 func exit(msg interface{}) {
-	fmt.Println("Error:", msg)
+	log.Fatal(msg)
 	os.Exit(1)
 }
